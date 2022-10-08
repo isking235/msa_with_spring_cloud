@@ -12,10 +12,22 @@ public class WebSecurity extends WebSecurityConfigurerAdapter {
     protected void configure(HttpSecurity http) throws Exception {
         //super.configure(http);
         http.csrf().disable();
-        http.authorizeRequests().antMatchers("/users/**").permitAll();
+        //http.authorizeRequests().antMatchers("/users/**").permitAll(); //이건 login 구현 하면서 주석 처리
+        http.authorizeRequests().antMatchers("/users/**")
+                .hasIpAddress("192.168.0.100")
+                .and()
+                .addFilter(getAuthenticationFilter());
+
         //이까지 입력하면 h2-console가 접속이 안된다.
         //아래 소스를 추가한다.
         http.headers().frameOptions().disable();
 
+    }
+
+    private AuthenticationFilter getAuthenticationFilter() throws Exception {
+        AuthenticationFilter authenticationFilter = new AuthenticationFilter();
+        authenticationFilter.setAuthenticationManager(authenticationManager());
+
+        return authenticationFilter;
     }
 }
