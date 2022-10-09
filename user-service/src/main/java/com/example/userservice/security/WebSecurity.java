@@ -25,19 +25,27 @@ public class WebSecurity extends WebSecurityConfigurerAdapter {
     }
 
     @Override
-    protected void configure(HttpSecurity http) throws Exception { //권한에 관한 것
-        //super.configure(http);
+    protected void configure(HttpSecurity http) throws Exception {
         http.csrf().disable();
-        //http.authorizeRequests().antMatchers("/users/**").permitAll(); //이건 login 구현 하면서 주석 처리
-        http.authorizeRequests().antMatchers("/users/**")
-                .hasIpAddress("192.168.0.100")
+
+//        http.authorizeRequests().antMatchers("/users/**").permitAll();
+
+        http.authorizeRequests().antMatchers("/actuator/**").permitAll();
+        http.authorizeRequests().antMatchers("/health_check/**").permitAll();
+        http.authorizeRequests().antMatchers("/**")
+                //.hasIpAddress(env.getProperty("gateway.ip")) // <- IP 변경
+                .access("hasIpAddress('" + env.getProperty("gateway.ip") + "')")
                 .and()
                 .addFilter(getAuthenticationFilter());
 
-        //이까지 입력하면 h2-console가 접속이 안된다.
-        //아래 소스를 추가한다.
-        http.headers().frameOptions().disable();
+//        http.authorizeRequests().antMatchers("/users")
+//                .hasIpAddress(env.getProperty("gateway.ip")) // <- IP 변경
+//                .and()
+//                .addFilter(getAuthenticationFilter());
+//
+//        http.authorizeRequests().anyRequest().denyAll();
 
+        http.headers().frameOptions().disable();
     }
 
     private AuthenticationFilter getAuthenticationFilter() throws Exception {

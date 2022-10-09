@@ -53,22 +53,18 @@ spring:
           uri: lb://CATALOG-SERVICE
           predicates:
             - Path=/catalog-service/**
-
         - id: order-service
           uri: lb://ORDER-SERVICE
           predicates:
             - Path=/order-service/**
-
         - id: first-service
           uri: lb://MY-FIRST-SERVICE
           predicates:
             - Path=/first-service/**
-
           filters:
             - CustomFilter
 #            - AddRequestHeader=first-request, first-request-header2
 #            - AddResponseHeader=first-response, first-response-header2
-
         - id: second-service
           uri: lb://MY-SECOND-SERVICE
           predicates:
