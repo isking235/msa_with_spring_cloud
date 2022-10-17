@@ -54,7 +54,7 @@ spring:
           uri: lb://USER-SERVICE
           predicates:
             - Path=/user-service/actuator/**
-            - Method=GET,POST
+            - Method=GET, POST
           filters:
             - RemoveRequestHeader=Cookie
             - RewritePath=/user-service/(?<segment>.*), /$\{segment}
@@ -87,8 +87,11 @@ spring:
                 baseMessage: Hi, there.
                 preLogger: true
                 postLogger: true
-#token:
-#  secret: user_token
+  config:
+    import: bootstrap.yml
+token:
+  secret: my_token
+
 
 management:
   endpoints:
