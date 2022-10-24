@@ -94,8 +94,8 @@ spring:
                 postLogger: true
   config:
     import: bootstrap.yml
-token:
-  secret: my_token
+#token:
+#  secret: my_token
 
 
 management:
