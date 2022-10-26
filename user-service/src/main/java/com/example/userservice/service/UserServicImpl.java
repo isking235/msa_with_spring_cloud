@@ -8,11 +8,16 @@ import com.example.userservice.vo.ResponseUser;
 import org.modelmapper.ModelMapper;
 import org.modelmapper.convention.MatchingStrategies;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.core.ParameterizedTypeReference;
+import org.springframework.core.env.Environment;
+import org.springframework.http.HttpMethod;
+import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.userdetails.User;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
+import org.springframework.web.client.RestTemplate;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -24,10 +29,32 @@ public class UserServicImpl implements UserService{
     UserRepository userRepository;
     BCryptPasswordEncoder passwordEncoder;
 
+    Environment env;
+    RestTemplate restTemplate;
+
+    @Override
+    public UserDetails loadUserByUsername(String username) throws UsernameNotFoundException {
+        UserEntity userEntity = userRepository.findByEmail(username);
+
+        if(userEntity == null)
+            throw new UsernameNotFoundException(username);
+
+        User user = new User(userEntity.getEmail(), userEntity.getEncryptedPwd(),
+
+                true, true, true, true, new ArrayList<>());
+
+        return user;
+    }
+
     @Autowired
-    public UserServicImpl(UserRepository userRepository, BCryptPasswordEncoder passwordEncoder) { //passwordEncoder 오류발생
+    public UserServicImpl(UserRepository userRepository,
+                          BCryptPasswordEncoder passwordEncoder,
+                          Environment env,
+                          RestTemplate restTemplate) { //passwordEncoder 오류발생
         this.userRepository = userRepository;
         this.passwordEncoder = passwordEncoder;
+        this.env = env;
+        this.restTemplate = restTemplate;
     }
 
     @Override
@@ -55,8 +82,16 @@ public class UserServicImpl implements UserService{
 
         UserDto userDto = new ModelMapper().map(userEntity, UserDto.class);
 
-        List<ResponseOrder> order = new ArrayList<>();
-        userDto.setOrders(order);
+//        List<ResponseOrder> order = new ArrayList<>();
+        String orderUrl = String.format(env.getProperty("order_service.url"),userId);
+        ResponseEntity<List<ResponseOrder>> orderListResponse =
+                restTemplate.exchange(orderUrl, HttpMethod.GET, null,
+                                        new ParameterizedTypeReference<List<ResponseOrder>>() {
+
+                });
+        List<ResponseOrder> orderList = orderListResponse.getBody();
+
+        userDto.setOrders(orderList);
 
 
         return userDto;
@@ -65,20 +100,6 @@ public class UserServicImpl implements UserService{
     @Override
     public Iterable<UserEntity> getUserByAll() {
         return userRepository.findAll();
-    }
-
-    @Override
-    public UserDetails loadUserByUsername(String username) throws UsernameNotFoundException {
-        UserEntity userEntity = userRepository.findByEmail(username);
-
-        if(userEntity == null)
-            throw new UsernameNotFoundException(username);
-
-        User user = new User(userEntity.getEmail(), userEntity.getEncryptedPwd(),
-
-                true, true, true, true, new ArrayList<>());
-
-        return user;
     }
 
     @Override

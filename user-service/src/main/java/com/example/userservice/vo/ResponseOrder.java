@@ -1,9 +1,12 @@
 package com.example.userservice.vo;
 
+import lombok.Data;
+
 import java.util.Date;
 
+@Data
 public class ResponseOrder {
-    private  String procductId;
+    private String procductId;
     private Integer qty;
     private Integer unitPrice;
     private Integer totalPrice;
