@@ -34,7 +34,7 @@ greeting:
 
 logging:
   level:
-    com.examle.userservice: DEBUG
+    com.examle.userservice.client: DEBUG
 
 management:
   endpoints:

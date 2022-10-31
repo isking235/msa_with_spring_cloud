@@ -6,6 +6,9 @@ import com.example.userservice.jpa.UserEntity;
 import com.example.userservice.jpa.UserRepository;
 import com.example.userservice.vo.ResponseOrder;
 import com.example.userservice.vo.ResponseUser;
+import feign.FeignException;
+import lombok.extern.slf4j.Slf4j;
+import lombok.extern.slf4j.XSlf4j;
 import org.hibernate.criterion.Order;
 import org.modelmapper.ModelMapper;
 import org.modelmapper.convention.MatchingStrategies;
@@ -26,6 +29,7 @@ import java.util.List;
 import java.util.UUID;
 
 @Service
+@Slf4j
 public class UserServicImpl implements UserService{
 
     UserRepository userRepository;
@@ -100,9 +104,13 @@ public class UserServicImpl implements UserService{
         List<ResponseOrder> orderList = orderListResponse.getBody();*/
 
         //Using a feign client
-        List<ResponseOrder> orderList = orderServiceClient.getOrder(userId);
-
-        userDto.setOrders(orderList);
+        /*Feign exception handling*/
+        List<ResponseOrder> orderList = null;
+        try {
+            orderList = orderServiceClient.getOrder(userId);
+        }catch (FeignException ex) {
+            log.error(ex.getMessage());
+        }
 
         userDto.setOrders(orderList);
 

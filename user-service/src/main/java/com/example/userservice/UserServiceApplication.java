@@ -1,8 +1,10 @@
 package com.example.userservice;
 
+import feign.Logger;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
+import org.springframework.cloud.client.discovery.EnableDiscoveryClient;
 import org.springframework.cloud.client.loadbalancer.LoadBalanced;
 import org.springframework.cloud.netflix.eureka.EnableEurekaClient;
 import org.springframework.cloud.openfeign.EnableFeignClients;
@@ -11,7 +13,7 @@ import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.web.client.RestTemplate;
 
 @SpringBootApplication
-@EnableEurekaClient
+@EnableDiscoveryClient
 @EnableFeignClients
 public class UserServiceApplication {
 
@@ -30,8 +32,9 @@ public class UserServiceApplication {
         return new RestTemplate();
     }
 
-    public feign.Logger.Level feignLoggerLevel() {
-        return feign.Logger.Level.FULL;
+    @Bean
+    public Logger.Level feignLoggerLevel() {
+        return Logger.Level.FULL;
     }
 
 }
