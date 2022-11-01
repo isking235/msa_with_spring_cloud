@@ -11,6 +11,6 @@ import java.util.List;
 public interface OrderServiceClient {
 
     @GetMapping("/order-service/{userId}/orders_ng")
-    List<ResponseOrder> getOrder(@PathVariable String userId);
+    List<ResponseOrder> getOrders(@PathVariable String userId);
 
 }
